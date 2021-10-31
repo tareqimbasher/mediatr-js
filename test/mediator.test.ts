@@ -1,6 +1,12 @@
 import {Mediator} from "@lib/mediator";
+import {AdditionHandler, AdditionRequest, AdditionResponse} from "./testdata";
 
-test('adds 2 numbers', () => {
+it('should return the correct response for a given request', async () => {
+    expect.assertions(1);
     const mediator = new Mediator();
-    expect(mediator.sum(1, 3)).toBe(4);
-})
+    mediator.register(AdditionRequest, AdditionHandler);
+    
+    const response = await mediator.send<AdditionResponse>(new AdditionRequest(1, 2))
+    
+    expect(response.sum).toEqual(3);
+});
