@@ -20,7 +20,7 @@ export class Mediator implements IMediator {
     }
 
     public async send<TResponse>(request: IRequest<TResponse>): Promise<TResponse> {
-        const handler = this.requestHandlerRegistry.resolveHandlerByRequestInstance(request);
+        const handler = this.requestHandlerRegistry.resolveHandler(request);
         return await handler.handle(request) as unknown as TResponse;
     }
 }

@@ -17,35 +17,35 @@ it('should register only once for a given request type', function () {
 it('should resolve the correct handler type when given request type', () => {
     const registry = new RequestHandlerRegistry();
     registry.register(AdditionRequest, AdditionHandler);
-    expect(registry.resolveHandlerTypeByRequestType(AdditionRequest)).toEqual(AdditionHandler);
+    expect(registry.resolveHandlerType(AdditionRequest)).toEqual(AdditionHandler);
 });
 
 it('should resolve the correct handler type when given request instance', () => {
     const registry = new RequestHandlerRegistry();
     registry.register(AdditionRequest, AdditionHandler);
-    expect(registry.resolveHandlerTypeByRequestInstance(new AdditionRequest(1, 2))).toEqual(AdditionHandler);
+    expect(registry.resolveHandlerType(new AdditionRequest(1, 2))).toEqual(AdditionHandler);
 });
 
 it('should resolve a null handler type when given request type when no registration exists', () => {
     const registry = new RequestHandlerRegistry();
-    expect(registry.resolveHandlerTypeByRequestType(AdditionRequest)).toBeNull();
+    expect(registry.resolveHandlerType(AdditionRequest)).toBeNull();
 });
 
 it('should resolve a null handler type when given request instance when no registration exists', () => {
     const registry = new RequestHandlerRegistry();
-    expect(registry.resolveHandlerTypeByRequestInstance(AdditionRequest)).toBeNull();
+    expect(registry.resolveHandlerType(AdditionRequest)).toBeNull();
 });
 
 it('should resolve a handler instance by request type', () => {
     const registry = new RequestHandlerRegistry();
     registry.register(AdditionRequest, AdditionHandler);
-    const handler = registry.resolveHandlerByRequestType(AdditionRequest);
+    const handler = registry.resolveHandler(AdditionRequest);
     expect(handler).toBeInstanceOf(AdditionHandler);
 });
 
 it('should resolve a handler instance by request instance', () => {
     const registry = new RequestHandlerRegistry();
     registry.register(AdditionRequest, AdditionHandler);
-    const handler = registry.resolveHandlerByRequestInstance(new AdditionRequest(1, 2));
+    const handler = registry.resolveHandler(new AdditionRequest(1, 2));
     expect(handler).toBeInstanceOf(AdditionHandler);
 });

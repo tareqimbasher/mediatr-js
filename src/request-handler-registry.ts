@@ -4,10 +4,14 @@ import {IBaseRequestHandler} from "@lib/request-handler";
 
 export interface IRequestHandlerRegistry {
     register(requestType: Constructable<IBaseRequest>, handlerType: Constructable<IBaseRequestHandler>): void;
-    resolveHandlerTypeByRequestType(requestType: Constructable<IBaseRequest>): Constructable<IBaseRequestHandler> | null;
-    resolveHandlerTypeByRequestInstance(request: IBaseRequest): Constructable<IBaseRequestHandler> | null;
-    resolveHandlerByRequestType(requestType: Constructable<IBaseRequest>): IBaseRequestHandler;
-    resolveHandlerByRequestInstance(request: IBaseRequest): IBaseRequestHandler;
+
+    resolveHandlerType(requestType: Constructable<IBaseRequest>): Constructable<IBaseRequestHandler> | null;
+
+    resolveHandlerType(request: IBaseRequest): Constructable<IBaseRequestHandler> | null;
+
+    resolveHandler(requestType: Constructable<IBaseRequest>): IBaseRequestHandler;
+
+    resolveHandler(request: IBaseRequest): IBaseRequestHandler;
 }
 
 export class RequestHandlerRegistry implements IRequestHandlerRegistry {
@@ -18,31 +22,31 @@ export class RequestHandlerRegistry implements IRequestHandlerRegistry {
         this.handlers.set(requestType, handlerType);
     }
 
-    public resolveHandlerTypeByRequestType(requestType: Constructable<IBaseRequest>): Constructable<IBaseRequestHandler> | null {
-        return this.handlers.get(requestType) ?? null;
-    }
-
-    public resolveHandlerTypeByRequestInstance(request: IBaseRequest): Constructable<IBaseRequestHandler> | null {
-        for (const [key, value] of Array.from(this.handlers.entries())) {
-            if (request instanceof key) {
-                return value;
+    public resolveHandlerType(typeOrInstance: Constructable<IBaseRequest> | IBaseRequest): Constructable<IBaseRequestHandler> | null {
+        if (typeof typeOrInstance === "object") {
+            for (const [key, value] of Array.from(this.handlers.entries())) {
+                if (typeOrInstance instanceof key) {
+                    return value;
+                }
             }
+            return null;
+        } else {
+            return this.handlers.get(typeOrInstance) ?? null;
         }
-        return null;
     }
-
-    public resolveHandlerByRequestType(requestType: Constructable<IBaseRequest>): IBaseRequestHandler {
-        const handlerType = this.resolveHandlerTypeByRequestType(requestType);
-        if (!handlerType) {
-            throw new Error("Could not resolve a handler for request type.");
+    
+    public resolveHandler(typeOrInstance: Constructable<IBaseRequest> | IBaseRequest): IBaseRequestHandler {
+        let handlerType: Constructable<IBaseRequestHandler> | null;
+        const argIsInstance = typeof typeOrInstance === "object";
+        
+        if (argIsInstance) {
+            handlerType = this.resolveHandlerType(typeOrInstance);
+        } else {
+            handlerType = this.resolveHandlerType(typeOrInstance);
         }
-        return new handlerType();
-    }
 
-    public resolveHandlerByRequestInstance(request: IBaseRequest): IBaseRequestHandler {
-        const handlerType = this.resolveHandlerTypeByRequestInstance(request);
         if (!handlerType) {
-            throw new Error("Could not resolve a handler for request instance.");
+            throw new Error(`Could not resolve a handler for request ${argIsInstance ? "instance" : "type"}.`);
         }
         return new handlerType();
     }
